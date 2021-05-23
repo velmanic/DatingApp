@@ -30,6 +30,7 @@ namespace DatingAPI
             services.AddDbContext<DataContext>(options => 
                         options.UseSqlite(_config.GetConnectionString("DefaultConnection")));
             services.AddControllers();
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,7 +45,14 @@ namespace DatingAPI
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            // global cors policy
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true) // allow any origin
+                .AllowCredentials()); // allow credentials
+
+            app.UseAuthorization();            
 
             app.UseEndpoints(endpoints =>
             {
