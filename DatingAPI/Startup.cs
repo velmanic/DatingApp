@@ -6,12 +6,19 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.DatingAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using DatingAPI.Interfaces;
+using DatingAPI.Services;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using DatingAPI.Extensions;
 
 namespace DatingAPI
 {
@@ -27,10 +34,10 @@ namespace DatingAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DataContext>(options => 
-                        options.UseSqlite(_config.GetConnectionString("DefaultConnection")));
+            services.AddApplicationServies(_config);
             services.AddControllers();
             services.AddCors();
+            services.AddIdentityServices(_config);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,6 +59,8 @@ namespace DatingAPI
                 .SetIsOriginAllowed(origin => true) // allow any origin
                 .AllowCredentials()); // allow credentials
 
+            app.UseAuthentication();
+            
             app.UseAuthorization();            
 
             app.UseEndpoints(endpoints =>
